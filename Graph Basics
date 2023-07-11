@@ -1,0 +1,93 @@
+#Install and load they library
+install.packages("tidyverse")
+library(tidyverse)
+
+#Exploring the data (mtcars and mpg datasets)
+class(mtcars)
+
+glimpse(mtcars)
+glimpse(mpg)
+
+head(mtcars)
+
+str(mtcars)
+str(mpg)
+
+summary(mtcars)
+summary(mpg)
+
+#Scatterplots
+mtcars %>%
+  ggplot(aes(x = disp, y = mpg)) +
+  geom_point()
+
+mtcars %>%
+  ggplot (aes(x = hp, y = mpg)) +
+  geom_point ()
+
+mtcars %>%
+  ggplot (aes(x = cyl, y = mpg)) +
+  geom_point()
+
+#Alpha
+mpg %>%
+  ggplot(aes(x = cyl, y = hwy)) +
+  geom_point (alpha = 0.1) +
+  geom_smooth(method = "lm", se = FALSE) +
+  labs(title = "MPG trend: hwy & cyl",
+       subtitle = "Points alpha blended")
+
+#Jitter
+mpg %>%
+  ggplot(aes(x = cyl, y = hwy)) +
+  geom_jitter() +
+  geom_point (alpha = 0.1) +
+  geom_smooth(method = "lm", se = FALSE) +
+  labs(title = "MPG trend: hwy & cyl",
+       subtitle = "Points alpha blended with jitter")
+
+#Custom Jitter
+mpg %>%
+  ggplot (aes(x = cyl, y = hwy)) +
+  geom_jitter(alpha =0.5, width = 0.2, height = 0.2) +
+  geom_smooth (method = "lm", se = FALSE) +
+  labs (title = "MPG trend: hwy vs cyl", 
+        subtitle = "Points alpha blended with custom jitter")
+
+#Change cyl to a categorical variable
+mpg %>%
+  ggplot(aes(x = displ, y = hwy, color = as.factor(cyl))) +
+  geom_jitter (alpha = 0.5) +
+  geom_smooth (method = "lm", se = FALSE) +
+  labs (title = "mpg trend: hwy vs displ",
+        subtitle = "cyl color")
+
+#Facet wrap
+mpg %>%
+  ggplot(aes(x = displ, y = hwy, color = class)) +
+  geom_jitter(alpha = 0.5) +
+  geom_smooth(method = "lm", se = FALSE) +
+  facet_wrap(~ class) +
+  labs(title = "mpg trend: hwy vs displ by class and cyl")
+
+#Facet Grid
+mpg %>%
+  ggplot(aes(x = displ, y = hwy, color = class)) +
+  geom_jitter(alpha = 0.5) +
+  geom_smooth(method = "lm", se = FALSE) +
+  facet_grid(. ~ cyl) +
+  labs(title = "mpg trend: hwy vs displ by class and cyl")
+
+mpg %>%
+  ggplot(aes(x = displ, y = hwy, color = class)) +
+  geom_jitter(alpha = 0.5) +
+  geom_smooth(method = "lm", se = FALSE) +
+  facet_grid(cyl ~ .) +
+  labs(title = "mpg trend: hwy vs displ by class and cyl")
+
+mpg %>%
+  ggplot(aes(x = displ, y = hwy, color = class)) +
+  geom_jitter(alpha = 0.5) +
+  geom_smooth(method = "lm", se = FALSE) +
+  facet_grid(cyl ~ class) +
+  labs(title = "mpg trend: hwy vs displ by class and cyl")
