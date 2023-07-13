@@ -1,0 +1,97 @@
+library(tidyverse)
+
+#Select
+df <- select(mpg, hwy, displ, cyl, class)
+
+head(df)
+head(df, 2)
+tail(df)
+
+#Piping
+df %>% head(n = 2)
+df %>% tail()
+
+#Arrange
+df %>% arrange(hwy)
+
+#Combining head and arrange
+head(arrange(df,hwy))
+df %>% arrange(hwy) %>% head
+
+df %>% arrange(hwy) %>% head(n = 2)
+
+head(arrange(df, desc(hwy)), n = 10)
+df %>% arrange (hwy %>% desc()) %>% head(n = 10)
+
+#Order by more than one column
+df %>%
+  arrange(class, hwy %>% desc()) %>%
+  head(n = 10)
+
+#Filter
+filter(df, cyl ==5)
+df %>% filter(cyl == 5)
+
+#Plot a filtered data frame
+df_filtered <- filter(df, cyl !=5)
+
+#Ploting the filtered data
+df_filtered %>%
+  ggplot(aes(x = displ, y = hwy)) +
+  geom_point() +
+  facet_wrap (~cyl)
+
+
+df_filtered %>%
+  ggplot(aes(x = displ, y = hwy, color = class)) +
+  geom_jitter(alpha = 0.5) +
+  geom_smooth(method = "lm", se = FALSE) +
+  facet_grid(class ~ cyl) +
+  labs(title = "mpg trend: displ vs hwy by class and cyl")
+
+#Ploting the top 10 results
+df_filtered %>% 
+  arrange(desc(hwy)) %>%
+  head(n = 10) %>%
+  ggplot(aes(x = displ, y = hwy, color = class)) +
+  geom_jitter(alpha = 0.8) +
+  geom_smooth(method = "lm", se = FALSE)
+  
+#Select and sort
+mpg %>%
+  names() %>%
+  sort()
+
+#Select all except
+mpg %>%
+  select (- trans, -fl) %>%
+  names()
+
+#Select range
+mpg %>%
+  select(model : hwy) %>%
+  names()
+
+#Combine selection
+mpg %>%
+  select(displ : fl, manufacturer, - trans) %>%
+  names()
+
+#Rename
+mpg %>%
+  rename(displacement = displ) %>%
+  names()
+
+mpg %>%
+  select(displacement = displ) %>%
+  names()
+
+#Everything
+mpg %>%
+  select(class, everything()) %>%
+  names()
+
+#Select_if
+mpg %>%
+  select_if (is.character) %>%
+  names()
