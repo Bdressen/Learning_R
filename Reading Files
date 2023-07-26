@@ -1,0 +1,108 @@
+library(tidyverse)
+#Write a csv file
+mpg %>% write_csv("mpg.csv")
+
+#Display the current working directory
+getwd()
+#Listing the contents of a directory
+dir()
+
+mpg %>% write_tsv("mpg.tsv")
+
+#Read csv
+df_csv <- "mpg.csv" %>% read_csv()
+df_tsv <- "mpg.tsv" %>% read_tsv()
+
+glimpse(mpg)
+glimpse(df_csv)
+glimpse(df_tsv)
+
+#read_csv options
+#trim_ws, on by default
+#guess_max, 1000 minimum
+
+#col_names, specify col names(TRUE or FALSE)
+df_csv_nocol <- "mpg.csv" %>% read_csv(col_names = FALSE)
+
+#skip, skp the first n rows
+df_skip <- read_csv("mpg.csv", col_names = FALSE, skip = 1)
+df_skip %>% glimpse()
+
+mpg_col_names <- names(mpg)
+mpg_col_names
+
+df_col_names_add <- read_csv("mpg.csv", col_names = mpg_col_names, skip = 1)
+glimpse(df_col_names_add)
+
+mpg_col_names <- c('vehicle', 'model', 'disp', 'year',
+                   'cyl', 'trans', 'drv', 'cty', 'hwy', 'fl', 'class')
+df_custom_col <- read_csv("mpg.csv", col_names = mpg_col_names, skip = 1)
+glimpse(df_custom_col)
+
+# col_types, define column types upon import
+mpg_types <- "ccdiicciicc"
+
+df_col_types <- read_csv("mpg.csv", col_names = mpg_col_names, skip = 1, 
+                         col_types = mpg_types)
+glimpse(df_col_types)
+df_col_types %>% spec()
+
+#Reading Excel Files
+library(readxl)
+
+system.file("extdata", package = "readxl") %>%
+  dir(full.names = TRUE)
+getwd()
+
+# Copy to current working directory
+file.copy(from = system.file("extdata", package = "readxl") %>%
+            dir(full.names = TRUE),
+          to = getwd())
+
+# Display file in current working directory, return only xls or xlsx
+dir(pattern = "xls")
+
+# Display the sheet names
+excel_sheets("datasets.xlsx")
+
+# Import xlsx
+Iris <- read_xlsx("datasets.xlsx")
+glimpse(Iris)
+
+# Import sheet
+df <- read_excel("datasets.xls", sheet = "mtcars")
+glimpse(df)
+
+# Messy sheet
+arts <- read_excel("deaths.xlsx", sheet = "arts")
+glimpse(arts)
+
+# Offset, skip header and footer
+arts <- read_excel("deaths.xlsx", sheet = "arts", 
+                   skip = 4, n_max = 10)
+head(arts)
+tail(arts)
+
+# Importing from internet
+auto_url <- "https://archive.ics.uci.edu/ml/machine-learning-databases/autos/imports-85.data"
+cols <- c("symb", "losses", "make", "fuel", "aspi", "doors", "body", "dr_wheels",
+          "engine_loc", "wheel_base", "length", "width", "height", "curb_weight",
+          "engine", "cyl", "engine_size", "fuel_systme", "bore", "stroke", "comp_ratio",
+          "horsepower", "rpm", "city_mpg", "hwy_mpg", "price")
+
+df<- read_csv(auto_url, col_names = cols)
+
+glimpse(df)
+
+# Change col types
+df2 <- df %>%
+  mutate(price = as.integer(price))
+
+glimpse(df2)
+
+# Drop NA
+df2 <- df2 %>%
+  drop_na() %>%
+  mutate(price = as.integer(price))
+
+glimpse(df2)
