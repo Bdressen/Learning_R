@@ -1,0 +1,83 @@
+library(odbc)
+library(DBI)
+library(tidyverse)
+
+# Connection string info
+driver_name <- "ODBC"
+server_name <- "server"
+database_name <- "database.name"
+user_id <- "learnsql"
+password <- "pass"
+
+# Connect to the database, store in conn variable
+conn <- dbConnect(odbc::odbc(),
+                  driver = driver_name,
+                  server = server_name,
+                  database = database_name,
+                  uid = user_id,
+                  pwd = password)
+
+print(conn)
+# Print connection details
+str(conn)
+
+# View list of tables (Sorted alphabetically and first 50)
+conn %>%
+  dbListTables() %>%
+  sort() %>%
+  head(50)
+
+# List the columns for a table
+conn %>%
+  dbListFields("Customer")
+
+# Create a SQL SELECT statement, store the query in a variable
+sql_customer <-
+  "SELECT TOP 10 CustomerID,
+    PersonID,
+    StoreID,
+    TerritoryID,
+    AccountNumber
+  FROM Sales.Customer"
+
+# Execute the query, store result
+df_customer <- conn %>%
+  dbGetQuery(sql_customer)
+
+glimpse(df_customer)
+
+# New SQL statement for sales person
+sql_sales_person <-
+  "SELECT TOP 10 BusinessEntityID,
+      TerritoryID,
+      SalesQuota,
+      Bonus,
+      CommissionPct
+  FROM Sales.SalesPerson
+  WHERE Bonus > 0
+  ORDER BY CommissionPct DESC"
+
+df_sales_person <- conn %>%
+  dbGetQuery(sql_sales_person)
+
+glimpse(df_sales_person)
+
+# Bring in all the data from SQL, performing the manipulation in R (Top 5 order quantity)
+sql_sales_order_detail <-
+  "SELECT *
+  FROM Sales.SalesOrderDetail"
+
+df_sales_order_detail <- conn %>%
+  dbGetQuery(sql_sales_order_detail) %>%
+  select(1:5) %>%
+  select(OrderQty, everything()) %>%
+  arrange(desc(OrderQty)) %>%
+  head(5)
+
+# Plot order frequency
+df_sales_order_detail %>%
+  ggplot(aes(x = OrderQty)) +
+  geom_bar()
+  
+# Close the database connection
+dbDisconnect(conn)
